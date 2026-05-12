@@ -14,7 +14,211 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      campaigns: {
+        Row: {
+          content_item_ids: string[]
+          created_at: string
+          id: string
+          linea: Database["public"]["Enums"]["linea_brand"]
+          name: string
+          project_id: string | null
+          status: Database["public"]["Enums"]["campaign_status"]
+          type: Database["public"]["Enums"]["campaign_type"]
+          user_id: string
+        }
+        Insert: {
+          content_item_ids?: string[]
+          created_at?: string
+          id?: string
+          linea?: Database["public"]["Enums"]["linea_brand"]
+          name: string
+          project_id?: string | null
+          status?: Database["public"]["Enums"]["campaign_status"]
+          type: Database["public"]["Enums"]["campaign_type"]
+          user_id: string
+        }
+        Update: {
+          content_item_ids?: string[]
+          created_at?: string
+          id?: string
+          linea?: Database["public"]["Enums"]["linea_brand"]
+          name?: string
+          project_id?: string | null
+          status?: Database["public"]["Enums"]["campaign_status"]
+          type?: Database["public"]["Enums"]["campaign_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaigns_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competitors: {
+        Row: {
+          ai_analysis: Json | null
+          analyzed_at: string | null
+          created_at: string
+          id: string
+          name: string
+          scraped_at: string | null
+          scraped_content: string | null
+          user_id: string
+          website_url: string
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          analyzed_at?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          scraped_at?: string | null
+          scraped_content?: string | null
+          user_id: string
+          website_url: string
+        }
+        Update: {
+          ai_analysis?: Json | null
+          analyzed_at?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          scraped_at?: string | null
+          scraped_content?: string | null
+          user_id?: string
+          website_url?: string
+        }
+        Relationships: []
+      }
+      content_items: {
+        Row: {
+          content: string
+          created_at: string
+          engagement_score: number | null
+          funnel_stage: Database["public"]["Enums"]["funnel_stage"]
+          id: string
+          image_prompt: string | null
+          linea: Database["public"]["Enums"]["linea_brand"]
+          platform: Database["public"]["Enums"]["platform_type"]
+          project_id: string | null
+          scheduled_for: string | null
+          status: Database["public"]["Enums"]["content_status"]
+          title: string
+          type: Database["public"]["Enums"]["content_type"]
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          engagement_score?: number | null
+          funnel_stage?: Database["public"]["Enums"]["funnel_stage"]
+          id?: string
+          image_prompt?: string | null
+          linea: Database["public"]["Enums"]["linea_brand"]
+          platform: Database["public"]["Enums"]["platform_type"]
+          project_id?: string | null
+          scheduled_for?: string | null
+          status?: Database["public"]["Enums"]["content_status"]
+          title: string
+          type: Database["public"]["Enums"]["content_type"]
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          engagement_score?: number | null
+          funnel_stage?: Database["public"]["Enums"]["funnel_stage"]
+          id?: string
+          image_prompt?: string | null
+          linea?: Database["public"]["Enums"]["linea_brand"]
+          platform?: Database["public"]["Enums"]["platform_type"]
+          project_id?: string | null
+          scheduled_for?: string | null
+          status?: Database["public"]["Enums"]["content_status"]
+          title?: string
+          type?: Database["public"]["Enums"]["content_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_items_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          active_lines: string[]
+          brand_voice: string
+          company_name: string
+          created_at: string
+          email: string | null
+          id: string
+          instagram_handle: string
+          onboarded: boolean
+          target_audiences: string[]
+          updated_at: string
+        }
+        Insert: {
+          active_lines?: string[]
+          brand_voice?: string
+          company_name?: string
+          created_at?: string
+          email?: string | null
+          id: string
+          instagram_handle?: string
+          onboarded?: boolean
+          target_audiences?: string[]
+          updated_at?: string
+        }
+        Update: {
+          active_lines?: string[]
+          brand_voice?: string
+          company_name?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          instagram_handle?: string
+          onboarded?: boolean
+          target_audiences?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          linea: Database["public"]["Enums"]["linea_brand"]
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          linea?: Database["public"]["Enums"]["linea_brand"]
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          linea?: Database["public"]["Enums"]["linea_brand"]
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +227,25 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      campaign_status: "draft" | "active" | "completed"
+      campaign_type: "email_sequence" | "social_campaign" | "weekly_batch"
+      content_status: "draft" | "approved" | "scheduled" | "published"
+      content_type:
+        | "reel_script"
+        | "carousel"
+        | "post_caption"
+        | "email"
+        | "tiktok_hook"
+        | "ad_copy"
+      funnel_stage: "tofu" | "mofu" | "bofu"
+      linea_brand: "tapes" | "zen" | "play" | "all"
+      platform_type:
+        | "instagram"
+        | "tiktok"
+        | "youtube"
+        | "threads"
+        | "email"
+        | "spotify_description"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +372,28 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      campaign_status: ["draft", "active", "completed"],
+      campaign_type: ["email_sequence", "social_campaign", "weekly_batch"],
+      content_status: ["draft", "approved", "scheduled", "published"],
+      content_type: [
+        "reel_script",
+        "carousel",
+        "post_caption",
+        "email",
+        "tiktok_hook",
+        "ad_copy",
+      ],
+      funnel_stage: ["tofu", "mofu", "bofu"],
+      linea_brand: ["tapes", "zen", "play", "all"],
+      platform_type: [
+        "instagram",
+        "tiktok",
+        "youtube",
+        "threads",
+        "email",
+        "spotify_description",
+      ],
+    },
   },
 } as const
