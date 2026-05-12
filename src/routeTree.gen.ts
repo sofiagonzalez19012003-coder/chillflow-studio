@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppStudioRouteImport } from './routes/_app/studio'
 import { Route as AppPlannerRouteImport } from './routes/_app/planner'
 import { Route as AppLibraryRouteImport } from './routes/_app/library'
+import { Route as AppEmailRouteImport } from './routes/_app/email'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCompetitorsRouteImport } from './routes/_app/competitors'
 
@@ -47,6 +48,11 @@ const AppLibraryRoute = AppLibraryRouteImport.update({
   path: '/library',
   getParentRoute: () => AppRoute,
 } as any)
+const AppEmailRoute = AppEmailRouteImport.update({
+  id: '/email',
+  path: '/email',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/competitors': typeof AppCompetitorsRoute
   '/dashboard': typeof AppDashboardRoute
+  '/email': typeof AppEmailRoute
   '/library': typeof AppLibraryRoute
   '/planner': typeof AppPlannerRoute
   '/studio': typeof AppStudioRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/competitors': typeof AppCompetitorsRoute
   '/dashboard': typeof AppDashboardRoute
+  '/email': typeof AppEmailRoute
   '/library': typeof AppLibraryRoute
   '/planner': typeof AppPlannerRoute
   '/studio': typeof AppStudioRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_app/competitors': typeof AppCompetitorsRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/email': typeof AppEmailRoute
   '/_app/library': typeof AppLibraryRoute
   '/_app/planner': typeof AppPlannerRoute
   '/_app/studio': typeof AppStudioRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/competitors'
     | '/dashboard'
+    | '/email'
     | '/library'
     | '/planner'
     | '/studio'
@@ -103,6 +113,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/competitors'
     | '/dashboard'
+    | '/email'
     | '/library'
     | '/planner'
     | '/studio'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_app/competitors'
     | '/_app/dashboard'
+    | '/_app/email'
     | '/_app/library'
     | '/_app/planner'
     | '/_app/studio'
@@ -168,6 +180,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLibraryRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/email': {
+      id: '/_app/email'
+      path: '/email'
+      fullPath: '/email'
+      preLoaderRoute: typeof AppEmailRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -188,6 +207,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppCompetitorsRoute: typeof AppCompetitorsRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppEmailRoute: typeof AppEmailRoute
   AppLibraryRoute: typeof AppLibraryRoute
   AppPlannerRoute: typeof AppPlannerRoute
   AppStudioRoute: typeof AppStudioRoute
@@ -196,6 +216,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppCompetitorsRoute: AppCompetitorsRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppEmailRoute: AppEmailRoute,
   AppLibraryRoute: AppLibraryRoute,
   AppPlannerRoute: AppPlannerRoute,
   AppStudioRoute: AppStudioRoute,
