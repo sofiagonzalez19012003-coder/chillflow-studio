@@ -36,15 +36,45 @@ Notes: ${data.notes || "—"}`;
     }
   });
 
-const AdInsightsSchema = z.object({ context: z.string().max(4000) });
+const StrategySchema = z.object({
+  totalBudgetUsd: z.number().min(15).max(5000),
+  startDate: z.string(),
+  postsSummary: z.string().max(8000),
+});
 
-export const generateAdInsights = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => AdInsightsSchema.parse(input))
+export const generateAdsStrategy = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => StrategySchema.parse(input))
   .handler(async ({ data }) => {
     const sys = `${CHILL_VIBE_BRAND_CONTEXT}
-You are a paid media analyst for Meta Ads. Return JSON:
-{ "working": ["..", ".."], "fix": ["..", ".."], "nextStep": "one concrete recommendation for the next 7 days" }
-Be specific, numeric, action-oriented. Spanish (LATAM).`;
-    const raw = await callAI({ system: sys, user: data.context, json: true });
+You are a senior LATAM Meta Ads strategist building a 15-day launch plan for a brand-new IG account (~15 followers, 0 paid history).
+Goals (in order): grow followers, build audience pixel data, validate which sub-brand & hook converts.
+Use the user's organic post performance to infer what hooks resonate. Recommend conservative budgets (USD 3–8/day per ad set) and stagger sub-brands.
+
+Return STRICT JSON with this exact shape:
+{
+  "diagnosis": "2–3 sentences in Spanish (LATAM) about what the organic data shows",
+  "recommendedDailyBudget": number,        // USD/day across the whole account
+  "split": { "tapes": number, "zen": number, "play": number }, // % integers summing to 100
+  "bestHours": ["HH:00", "HH:00"],         // 2 peak posting hours from data, LATAM time
+  "audiences": [
+    { "linea": "tapes"|"zen"|"play", "audience": "deep_workers"|"students"|"gamers"|"mindfulness_enthusiasts", "interests": ["...","..."], "geos": ["CO","MX","AR"] }
+  ],
+  "creatives": [
+    { "linea": "tapes"|"zen"|"play", "headline": "≤40 chars", "primaryText": "≤125 chars con hook en línea 1", "cta": "Listen Now"|"Save Playlist"|"Learn More"|"Subscribe", "creativePrompt": "watercolor MJ prompt" }
+  ],
+  "plan": [
+    { "day": 1, "date": "YYYY-MM-DD", "phase": "Test"|"Learn"|"Scale", "budgetUsd": number, "linea": "tapes"|"zen"|"play"|"all", "action": "qué lanzar/pausar/duplicar hoy en español" }
+  ],   // EXACTLY 15 entries, day 1..15, dates starting at startDate
+  "kpisWeek1": { "reachTarget": number, "newFollowersTarget": number, "ctrTarget": "0.0%" },
+  "kpisWeek2": { "reachTarget": number, "newFollowersTarget": number, "ctrTarget": "0.0%" },
+  "nextSteps": ["...", "...", "..."]   // 3 acciones concretas para el día 16+
+}
+Spanish (LATAM). Be numeric and specific. No prose outside JSON.`;
+    const usr = `Total budget for 15 days: $${data.totalBudgetUsd} USD
+Start date: ${data.startDate}
+
+Organic posts performance (CSV-derived summary):
+${data.postsSummary}`;
+    const raw = await callAI({ system: sys, user: usr, json: true, model: "google/gemini-2.5-pro" });
     return { json: raw };
   });
