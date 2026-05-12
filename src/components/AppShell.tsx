@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Home, Sparkles, Calendar, Mail, Search, BarChart3, Settings, LogOut, BookOpen } from "lucide-react";
+import { Home, Sparkles, Calendar, Mail, Search, BarChart3, Settings, LogOut, BookOpen, Zap } from "lucide-react";
 import { toast } from "sonner";
 
 const NAV = [
@@ -11,6 +11,7 @@ const NAV = [
   { to: "/planner", label: "Planner", icon: Calendar },
   { to: "/email", label: "Email", icon: Mail },
   { to: "/competitors", label: "Competitor Intel", icon: Search },
+  { to: "/ads", label: "Ads", icon: Zap },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
