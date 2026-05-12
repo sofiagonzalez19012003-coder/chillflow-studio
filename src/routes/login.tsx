@@ -49,20 +49,11 @@ function LoginPage() {
   }
 
   async function google() {
-    try {
-      const { lovable } = await import("@/integrations/lovable/index");
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin + "/dashboard",
-      });
-      if (result.error) toast.error("Google sign-in failed.");
-    } catch {
-      // Fallback to supabase oauth if lovable module unavailable
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo: window.location.origin + "/dashboard" },
-      });
-      if (error) toast.error(error.message);
-    }
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin + "/dashboard" },
+    });
+    if (error) toast.error(error.message);
   }
 
   return (
