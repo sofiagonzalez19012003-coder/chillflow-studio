@@ -18,6 +18,7 @@ import { Route as AppLibraryRouteImport } from './routes/_app/library'
 import { Route as AppEmailRouteImport } from './routes/_app/email'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCompetitorsRouteImport } from './routes/_app/competitors'
+import { Route as AppAnalyticsRouteImport } from './routes/_app/analytics'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -63,10 +64,16 @@ const AppCompetitorsRoute = AppCompetitorsRouteImport.update({
   path: '/competitors',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/analytics': typeof AppAnalyticsRoute
   '/competitors': typeof AppCompetitorsRoute
   '/dashboard': typeof AppDashboardRoute
   '/email': typeof AppEmailRoute
@@ -77,6 +84,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/analytics': typeof AppAnalyticsRoute
   '/competitors': typeof AppCompetitorsRoute
   '/dashboard': typeof AppDashboardRoute
   '/email': typeof AppEmailRoute
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/_app/analytics': typeof AppAnalyticsRoute
   '/_app/competitors': typeof AppCompetitorsRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/email': typeof AppEmailRoute
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/analytics'
     | '/competitors'
     | '/dashboard'
     | '/email'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/analytics'
     | '/competitors'
     | '/dashboard'
     | '/email'
@@ -122,6 +133,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/login'
+    | '/_app/analytics'
     | '/_app/competitors'
     | '/_app/dashboard'
     | '/_app/email'
@@ -201,10 +213,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCompetitorsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/analytics': {
+      id: '/_app/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AppAnalyticsRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppAnalyticsRoute: typeof AppAnalyticsRoute
   AppCompetitorsRoute: typeof AppCompetitorsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppEmailRoute: typeof AppEmailRoute
@@ -214,6 +234,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAnalyticsRoute: AppAnalyticsRoute,
   AppCompetitorsRoute: AppCompetitorsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppEmailRoute: AppEmailRoute,
