@@ -19,6 +19,7 @@ import { Route as AppEmailRouteImport } from './routes/_app/email'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCompetitorsRouteImport } from './routes/_app/competitors'
 import { Route as AppAnalyticsRouteImport } from './routes/_app/analytics'
+import { Route as AppAdsRouteImport } from './routes/_app/ads'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -69,10 +70,16 @@ const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdsRoute = AppAdsRouteImport.update({
+  id: '/ads',
+  path: '/ads',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/ads': typeof AppAdsRoute
   '/analytics': typeof AppAnalyticsRoute
   '/competitors': typeof AppCompetitorsRoute
   '/dashboard': typeof AppDashboardRoute
@@ -84,6 +91,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/ads': typeof AppAdsRoute
   '/analytics': typeof AppAnalyticsRoute
   '/competitors': typeof AppCompetitorsRoute
   '/dashboard': typeof AppDashboardRoute
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/_app/ads': typeof AppAdsRoute
   '/_app/analytics': typeof AppAnalyticsRoute
   '/_app/competitors': typeof AppCompetitorsRoute
   '/_app/dashboard': typeof AppDashboardRoute
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/ads'
     | '/analytics'
     | '/competitors'
     | '/dashboard'
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/ads'
     | '/analytics'
     | '/competitors'
     | '/dashboard'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/login'
+    | '/_app/ads'
     | '/_app/analytics'
     | '/_app/competitors'
     | '/_app/dashboard'
@@ -220,10 +232,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAnalyticsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/ads': {
+      id: '/_app/ads'
+      path: '/ads'
+      fullPath: '/ads'
+      preLoaderRoute: typeof AppAdsRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppAdsRoute: typeof AppAdsRoute
   AppAnalyticsRoute: typeof AppAnalyticsRoute
   AppCompetitorsRoute: typeof AppCompetitorsRoute
   AppDashboardRoute: typeof AppDashboardRoute
@@ -234,6 +254,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAdsRoute: AppAdsRoute,
   AppAnalyticsRoute: AppAnalyticsRoute,
   AppCompetitorsRoute: AppCompetitorsRoute,
   AppDashboardRoute: AppDashboardRoute,
@@ -253,3 +274,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
