@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppStudioRouteImport } from './routes/_app/studio'
+import { Route as AppLibraryRouteImport } from './routes/_app/library'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCompetitorsRouteImport } from './routes/_app/competitors'
 
@@ -35,6 +36,11 @@ const AppStudioRoute = AppStudioRouteImport.update({
   path: '/studio',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLibraryRoute = AppLibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/competitors': typeof AppCompetitorsRoute
   '/dashboard': typeof AppDashboardRoute
+  '/library': typeof AppLibraryRoute
   '/studio': typeof AppStudioRoute
 }
 export interface FileRoutesByTo {
@@ -58,6 +65,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/competitors': typeof AppCompetitorsRoute
   '/dashboard': typeof AppDashboardRoute
+  '/library': typeof AppLibraryRoute
   '/studio': typeof AppStudioRoute
 }
 export interface FileRoutesById {
@@ -67,13 +75,20 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_app/competitors': typeof AppCompetitorsRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/library': typeof AppLibraryRoute
   '/_app/studio': typeof AppStudioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/competitors' | '/dashboard' | '/studio'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/competitors'
+    | '/dashboard'
+    | '/library'
+    | '/studio'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/competitors' | '/dashboard' | '/studio'
+  to: '/' | '/login' | '/competitors' | '/dashboard' | '/library' | '/studio'
   id:
     | '__root__'
     | '/'
@@ -81,6 +96,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_app/competitors'
     | '/_app/dashboard'
+    | '/_app/library'
     | '/_app/studio'
   fileRoutesById: FileRoutesById
 }
@@ -120,6 +136,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppStudioRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/library': {
+      id: '/_app/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof AppLibraryRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -140,12 +163,14 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppCompetitorsRoute: typeof AppCompetitorsRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppLibraryRoute: typeof AppLibraryRoute
   AppStudioRoute: typeof AppStudioRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppCompetitorsRoute: AppCompetitorsRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppLibraryRoute: AppLibraryRoute,
   AppStudioRoute: AppStudioRoute,
 }
 
