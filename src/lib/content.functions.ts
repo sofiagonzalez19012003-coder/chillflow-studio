@@ -73,12 +73,7 @@ ${data.source}
 ---
 Repurpose into these formats: ${data.formats.join(", ")}`;
     const raw = await callAI({ system: sys, user: usr, json: true });
-    try {
-      const j = JSON.parse(raw);
-      return { results: Array.isArray(j.results) ? j.results : [] };
-    } catch {
-      return { results: [] };
-    }
+    return { resultsJson: raw };
   });
 
 const WeekSchema = z.object({
@@ -95,12 +90,7 @@ Follow Chill Vibe weekly batching: 2 new Reels (cinematic/lo-fi), 2 repeated Ree
     const usr = `Generate 7 days of content. Theme: ${data.theme || "general nocturnal productivity"}.
 Active sub-brands: ${data.lineas.join(", ")}.`;
     const raw = await callAI({ system: sys, user: usr, json: true });
-    try {
-      const j = JSON.parse(raw);
-      return { items: Array.isArray(j.items) ? j.items : [] };
-    } catch {
-      return { items: [] };
-    }
+    return { itemsJson: raw };
   });
 
 const EmailSchema = z.object({
@@ -121,12 +111,7 @@ Sequence structure:
 Return JSON: { "emails": [ { "position": N, "subject": "<50 chars Spanish", "body": "scannable body", "cta": "button text" } ] }`;
     const usr = `Goal: ${data.goal}. Sub-brand: ${data.linea}. Number of emails: ${data.count}.`;
     const raw = await callAI({ system: sys, user: usr, json: true });
-    try {
-      const j = JSON.parse(raw);
-      return { emails: Array.isArray(j.emails) ? j.emails : [] };
-    } catch {
-      return { emails: [] };
-    }
+    return { emailsJson: raw };
   });
 
 const InsightsSchema = z.object({
@@ -140,10 +125,5 @@ export const generateInsights = createServerFn({ method: "POST" })
 You are a marketing analyst. Return JSON: { "insights": [ { "title": "...", "detail": "actionable next step", "linea": "tapes|zen|play|all" } ] }
 Generate exactly 3 sharp, specific, action-oriented insights — never vague platitudes.`;
     const raw = await callAI({ system: sys, user: data.context, json: true });
-    try {
-      const j = JSON.parse(raw);
-      return { insights: Array.isArray(j.insights) ? j.insights.slice(0,3) : [] };
-    } catch {
-      return { insights: [] };
-    }
+    return { insightsJson: raw };
   });
