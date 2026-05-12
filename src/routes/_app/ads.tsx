@@ -74,7 +74,7 @@ function Manager() {
   const [budget, setBudget] = useState(5);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
-  const [draft, setDraft] = useState<null | Awaited<ReturnType<typeof callType>>>(null);
+  const [draft, setDraft] = useState<null | Draft>(null);
   const generate = useServerFn(generateAdCreative);
 
   const [rules, setRules] = useState({
@@ -258,8 +258,7 @@ function Manager() {
   );
 }
 
-// helper for the inferred draft type
-async function callType() { return await ({} as ReturnType<typeof generateAdCreative>); }
+type Draft = { headline: string; primaryText: string; cta: string; creativePrompt: string; campaignName: string };
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
