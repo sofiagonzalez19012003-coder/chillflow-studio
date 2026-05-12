@@ -88,7 +88,7 @@ type Aggregated = {
   byHour: { hour: number; posts: number; reach: number; eng: number }[];
   byDow: { dow: string; posts: number; reach: number; eng: number }[];
   byType: { type: string; posts: number; reach: number; eng: number }[];
-  topPosts: { title: string; date: string; reach: number; eng: number }[];
+  topPosts: { title: string; date: string; reach: number; views: number; react: number; comm: number; shar: number; clk: number; eng: number; type: string; ts: number }[];
   hashtagsTop: { tag: string; count: number }[];
   dateRange: { from: string; to: string };
 };
@@ -120,7 +120,7 @@ function aggregate(rows: Row[]): Aggregated | null {
 
   let totalReach = 0, totalViews = 0, totalReactions = 0, totalComments = 0, totalShares = 0, totalClicks = 0;
   let minDate = "", maxDate = "";
-  const ranked: { title: string; date: string; reach: number; eng: number }[] = [];
+  const ranked: { title: string; date: string; reach: number; views: number; react: number; comm: number; shar: number; clk: number; eng: number; type: string; ts: number }[] = [];
 
   for (const r of valid) {
     const reach = NUM(r[reachKey]);
@@ -150,7 +150,8 @@ function aggregate(rows: Row[]): Aggregated | null {
     bumpType(typeMap, r[typeKey] || "—", reach, eng);
 
     const title = (r[titleKey] || "").replace(/\s+/g, " ").slice(0, 140);
-    ranked.push({ title, date: iso || t, reach, eng });
+    const ts = iso ? new Date(iso).getTime() : 0;
+    ranked.push({ title, date: iso || t, reach, views, react, comm, shar, clk, eng, type: r[typeKey] || "—", ts });
 
     const tags = (r[titleKey] || "").match(/#[\p{L}\d_]+/gu) || [];
     for (const tg of tags) {
@@ -165,7 +166,17 @@ function aggregate(rows: Row[]): Aggregated | null {
     byHour: [...hourMap.entries()].map(([h, v]) => ({ hour: h, ...v })).sort((a, b) => a.hour - b.hour),
     byDow: DOW.map((d) => ({ dow: d, ...(dowMap.get(d) || { posts: 0, reach: 0, eng: 0 }) })),
     byType: [...typeMap.entries()].map(([t, v]) => ({ type: t, ...v })),
-    topPosts: ranked.sort((a, b) => b.eng - a.eng || b.reach - a.reach).slice(0, 8),
+    topPosts: (() => {
+      let maxTs = 0;
+      for (const p of ranked) {
+        if (p.ts > maxTs) maxTs = p.ts;
+      }
+      const ninetyDaysMs = 90 * 24 * 60 * 60 * 1000;
+      const cutoffTs = maxTs > 0 ? maxTs - ninetyDaysMs : 0;
+      return ranked
+        .filter((p) => p.ts >= cutoffTs)
+        .sort((a, b) => b.eng - a.eng || b.reach - a.reach);
+    })(),
     hashtagsTop: [...tagMap.entries()].map(([tag, count]) => ({ tag, count })).sort((a, b) => b.count - a.count).slice(0, 10),
     dateRange: { from: minDate, to: maxDate },
   };
@@ -195,7 +206,7 @@ function bumpType(m: Map<string, { posts: number; reach: number; eng: number }>,
 function summaryForAI(a: Aggregated): string {
   const peakHours = [...a.byHour].sort((x, y) => y.eng - x.eng || y.reach - x.reach).slice(0, 3).map((x) => `${x.hour}:00 (eng ${x.eng}, reach ${x.reach})`).join(", ");
   const peakDow = [...a.byDow].sort((x, y) => y.eng - x.eng || y.reach - x.reach).slice(0, 3).map((x) => `${x.dow} (eng ${x.eng})`).join(", ");
-  const top = a.topPosts.slice(0, 5).map((p, i) => `${i + 1}. [${p.date}] reach=${p.reach} eng=${p.eng} — "${p.title}"`).join("\n");
+  const top = a.topPosts.slice(0, 15).map((p, i) => `${i + 1}. [${p.date}] reach=${p.reach} views=${p.views} react=${p.react} eng=${p.eng} — "${p.title}"`).join("\n");
   const tags = a.hashtagsTop.slice(0, 8).map((t) => `${t.tag}(${t.count})`).join(" ");
   return `Window: ${a.dateRange.from} → ${a.dateRange.to}
 Posts: ${a.totalPosts} · Reach total: ${a.totalReach} · Views: ${a.totalViews}
@@ -308,29 +319,43 @@ function PerfDashboard({ a }: { a: Aggregated }) {
       </div>
 
       <section className="brand-card p-5">
-        <h3 className="font-display text-lg mb-3">Top posts por engagement</h3>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>#</TableHead>
-              <TableHead>Fecha</TableHead>
-              <TableHead>Reach</TableHead>
-              <TableHead>Eng</TableHead>
-              <TableHead>Texto</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {a.topPosts.map((p, i) => (
-              <TableRow key={i}>
-                <TableCell className="font-mono">{i + 1}</TableCell>
-                <TableCell className="font-mono text-xs">{p.date}</TableCell>
-                <TableCell>{p.reach}</TableCell>
-                <TableCell>{p.eng}</TableCell>
-                <TableCell className="max-w-[480px] truncate" title={p.title}>{p.title}</TableCell>
+        <h3 className="font-display text-lg mb-3">Posts de los últimos 90 días (Por rendimiento)</h3>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>#</TableHead>
+                <TableHead>Fecha</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Reach</TableHead>
+                <TableHead>Views</TableHead>
+                <TableHead>React</TableHead>
+                <TableHead>Comm</TableHead>
+                <TableHead>Share</TableHead>
+                <TableHead>Click</TableHead>
+                <TableHead>Eng</TableHead>
+                <TableHead>Texto</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {a.topPosts.map((p, i) => (
+                <TableRow key={i}>
+                  <TableCell className="font-mono">{i + 1}</TableCell>
+                  <TableCell className="font-mono text-xs whitespace-nowrap">{p.date}</TableCell>
+                  <TableCell className="text-xs whitespace-nowrap">{p.type}</TableCell>
+                  <TableCell>{p.reach}</TableCell>
+                  <TableCell>{p.views}</TableCell>
+                  <TableCell>{p.react}</TableCell>
+                  <TableCell>{p.comm}</TableCell>
+                  <TableCell>{p.shar}</TableCell>
+                  <TableCell>{p.clk}</TableCell>
+                  <TableCell className="font-bold">{p.eng}</TableCell>
+                  <TableCell className="max-w-[300px] truncate" title={p.title}>{p.title}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </section>
 
       {a.hashtagsTop.length > 0 && (
