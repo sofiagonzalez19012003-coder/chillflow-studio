@@ -77,10 +77,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "AI marketing command center for Chill Vibe by Kapital Music. Content, planner, email, and competitor intel in one place." },
       { name: "author", content: "Chill Vibe" },
       { property: "og:title", content: "Chill Vibe — Marketing Command Center" },
-      { property: "og:description", content: "AI marketing command center for the Chill Vibe sub-brands: Tapes, Zen, Play." },
+      { property: "og:description", content: "AI marketing command center for Chill Vibe by Kapital Music. Content, planner, email, and competitor intel in one place." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@chillvibeglobal" },
+      { name: "twitter:title", content: "Chill Vibe — Marketing Command Center" },
+      { name: "twitter:description", content: "AI marketing command center for Chill Vibe by Kapital Music. Content, planner, email, and competitor intel in one place." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/FrP0qMhdJBdwm7Kx68zW5kPHvOW2/social-images/social-1778602966029-1._Logo-letras.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/FrP0qMhdJBdwm7Kx68zW5kPHvOW2/social-images/social-1778602966029-1._Logo-letras.webp" },
     ],
     links: [
       {
