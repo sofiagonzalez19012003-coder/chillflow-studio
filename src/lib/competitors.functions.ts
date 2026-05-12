@@ -34,13 +34,13 @@ Be specific. Every point must have concrete strategic implications for Chill Vib
       json: true,
     });
 
-    let analysis: Record<string, unknown> = {};
+    let analysisJson = "";
     try {
-      analysis = JSON.parse(raw);
+      analysisJson = JSON.stringify(JSON.parse(raw));
     } catch {
-      analysis = { positioning: raw };
+      analysisJson = JSON.stringify({ positioning: raw });
     }
-    return { scraped, analysis };
+    return { scraped, analysisJson };
   });
 
 const CompareSchema = z.object({
@@ -57,5 +57,12 @@ export const compareCompetitors = createServerFn({ method: "POST" })
 Return JSON: { "comparison": "side-by-side narrative", "latam_advantage": "Chill Vibe's specific LATAM differentiation in 3-5 punchy bullets joined with newlines" }`;
     const usr = `Compare these competitors for Chill Vibe:\n${JSON.stringify(data.competitors, null, 2)}`;
     const raw = await callAI({ system: sys, user: usr, json: true });
-    try { return JSON.parse(raw); } catch { return { comparison: raw, latam_advantage: "" }; }
+    let comparison = raw;
+    let latam_advantage = "";
+    try {
+      const j = JSON.parse(raw);
+      comparison = String(j.comparison ?? raw);
+      latam_advantage = String(j.latam_advantage ?? "");
+    } catch { /* ignore */ }
+    return { comparison, latam_advantage };
   });
